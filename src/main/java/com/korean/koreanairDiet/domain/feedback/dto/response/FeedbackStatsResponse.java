@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FeedbackStatsResponse {
+public class FeedbackStatsResponse { // 전체 메뉴에 대한 피드백 통계 응답 DTO -> 사용 안함
     private Long menuId;
     private String menuName;
     private FeedbackResponse feedback;

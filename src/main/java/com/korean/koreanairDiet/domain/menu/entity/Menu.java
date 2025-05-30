@@ -42,7 +42,7 @@ public class Menu {
     @Column(name = "menu_type", length = 10)
     private String menuType; // 'REGULAR', 'GRAB_AND_GO' 등으로 구분
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_feedback")
     private Feedback feedback;
 }
