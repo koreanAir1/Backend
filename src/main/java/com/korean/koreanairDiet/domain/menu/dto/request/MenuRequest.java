@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Getter
 @Builder
 @NoArgsConstructor
@@ -15,6 +17,7 @@ public class MenuRequest {
     private String menuNutri;
     private String menuName;
     private String weekday;
+    private LocalDate menuDate;
     private String menuImgUrl;
     private String menuType; // 'REGULAR', 'GRAB_AND_GO'
 }
