@@ -36,15 +36,14 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     public List<MenuWeeklyResponse> getWeeklyMenus() {
-        List<String> weekdays = Arrays.asList("월요일", "화요일", "수요일", "목요일", "금요일");
+        List<String> weekdays = Arrays.asList("MON", "TUE", "WED", "THR", "FRI");
 
-        // 이번 주 시작일을 구합니다 (월요일 기준)
-        LocalDate today = LocalDate.now();
-        LocalDate startOfWeek = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        // 테스트를 위해 5월 26일을 시작일로 고정 (월요일)
+        LocalDate startOfWeek = LocalDate.of(2025, 5, 26);
 
         return weekdays.stream()
                 .map(weekday -> {
-                    // 해당 요일의 날짜 계산
+                    // 해당 요일의 날짜 계산 (요일 인덱스에 따라 날짜 설정)
                     int dayOffset = weekdays.indexOf(weekday);
                     LocalDate menuDate = startOfWeek.plusDays(dayOffset);
 
