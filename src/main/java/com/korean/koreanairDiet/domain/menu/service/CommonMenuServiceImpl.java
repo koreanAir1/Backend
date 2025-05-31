@@ -74,7 +74,7 @@ public class CommonMenuServiceImpl implements CommonMenuService {
 
     @Override
     public List<CommonMenuWeeklyResponse> getWeeklyCommonMenus() {
-        List<String> weekdays = Arrays.asList("월요일", "화요일", "수요일", "목요일", "금요일");
+        List<String> weekdays = Arrays.asList("MON", "TUE", "WED", "THR", "FRI");
 
         return weekdays.stream()
                 .map(weekday -> {
