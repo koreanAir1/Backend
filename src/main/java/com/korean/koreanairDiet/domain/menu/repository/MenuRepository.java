@@ -25,4 +25,6 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
     List<Menu> findByWeekdayAndMenuDate(String weekday, LocalDate menuDate);
 
     List<Menu> findByWeekdayAndMenuDateAndMenuType(String weekday, LocalDate menuDate, String menuType);
+
+    List<Menu> findByMenuDate(LocalDate menuDate);
 }

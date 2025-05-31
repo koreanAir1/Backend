@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Getter
 @Builder
 @NoArgsConstructor
@@ -16,4 +18,5 @@ public class DietRecommendationRequest {
     private Integer sweet;     // 단맛 (0-100)
     private Integer bland;     // 싱거운맛 (0-100)
     private String comment;    // 추가 의견
+    LocalDate menuDate;
 }

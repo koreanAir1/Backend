@@ -19,6 +19,9 @@ public enum ResponseCode {
     FEEDBACK_ADD_SUCCESS("F001", "피드백 추가 성공"),
     FEEDBACK_GET_SUCCESS("F002", "피드백 조회 성공"),
     FEEDBACK_STATS_SUCCESS("F003", "피드백 통계 조회 성공"),
+    MENU_RECOMMENDATION_SUCCESS("MENU_RECOMMENDATION_SUCCESS", "식단 추천이 성공적으로 완료되었습니다."),
+
+
 
     // 실패 코드
     MENU_NOT_FOUND("E001", "메뉴를 찾을 수 없습니다"),
