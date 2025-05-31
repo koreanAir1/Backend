@@ -9,9 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MenuRankResponse {
-    private Long idMenu;
-    private String menuName;
-    private Integer menuLiked;
-    private String menuType;
+public class MenuLineResponse {
+    private MenuDayResponse menuInfo;
+    private String lines; // "A/B" 또는 "C" 또는 "E/F" 등
 }

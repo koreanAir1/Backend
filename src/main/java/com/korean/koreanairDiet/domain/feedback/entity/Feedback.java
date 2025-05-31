@@ -1,7 +1,6 @@
 package com.korean.koreanairDiet.domain.feedback.entity;
 
 import com.korean.koreanairDiet.domain.menu.entity.Menu;
-
 import jakarta.persistence.*;
 import lombok.*;
 

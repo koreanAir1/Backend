@@ -3,7 +3,7 @@ package com.korean.koreanairDiet.domain.menu.service;
 import com.korean.koreanairDiet.domain.menu.dto.request.MenuLikeRequest;
 import com.korean.koreanairDiet.domain.menu.dto.request.MenuRequest;
 import com.korean.koreanairDiet.domain.menu.dto.response.MenuDayResponse;
-import com.korean.koreanairDiet.domain.menu.dto.response.MenuRankResponse;
+import com.korean.koreanairDiet.domain.menu.dto.response.MenuLineResponse;
 import com.korean.koreanairDiet.domain.menu.dto.response.MenuResponse;
 import com.korean.koreanairDiet.domain.menu.dto.response.MenuWeeklyResponse;
 import com.korean.koreanairDiet.domain.menu.entity.Menu;
@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -34,44 +35,41 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    public List<MenuResponse> getAllMenus() {
-        List<Menu> menus = menuRepository.findAll();
-        return menus.stream()
-                .map(this::mapToMenuResponse)
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public List<MenuWeeklyResponse> getWeeklyMenus() {
         List<String> weekdays = Arrays.asList("월요일", "화요일", "수요일", "목요일", "금요일");
 
+        // 이번 주 시작일을 구합니다 (월요일 기준)
+        LocalDate today = LocalDate.now();
+        LocalDate startOfWeek = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+
         return weekdays.stream()
                 .map(weekday -> {
-                    // 아침 메뉴
-                    List<Menu> breakfastMenus = menuRepository.findByWeekdayAndMenuLine(weekday, "아침");
-                    MenuDayResponse breakfast = breakfastMenus.isEmpty() ? null :
-                            mapToMenuDayResponse(breakfastMenus.get(0));
+                    // 해당 요일의 날짜 계산
+                    int dayOffset = weekdays.indexOf(weekday);
+                    LocalDate menuDate = startOfWeek.plusDays(dayOffset);
 
-                    // 점심 메뉴
-                    List<Menu> lunchMenus = menuRepository.findByWeekdayAndMenuLine(weekday, "점심");
-                    MenuDayResponse lunch = lunchMenus.isEmpty() ? null :
-                            mapToMenuDayResponse(lunchMenus.get(0));
+                    // 해당 요일과 날짜에 맞는 일반 메뉴 조회
+                    List<Menu> regularMenus = menuRepository.findByWeekdayAndMenuDateAndMenuType(
+                            weekday, menuDate, "REGULAR");
 
-                    // 저녁 메뉴
-                    List<Menu> dinnerMenus = menuRepository.findByWeekdayAndMenuLine(weekday, "저녁");
-                    MenuDayResponse dinner = dinnerMenus.isEmpty() ? null :
-                            mapToMenuDayResponse(dinnerMenus.get(0));
+                    // 메뉴별로 정보를 변환
+                    List<MenuLineResponse> menuLineResponses = regularMenus.stream()
+                            .map(menu -> MenuLineResponse.builder()
+                                    .menuInfo(mapToMenuDayResponse(menu))
+                                    .lines(menu.getMenuLine())
+                                    .build())
+                            .collect(Collectors.toList());
 
                     // 그랩앤고 메뉴
-                    List<Menu> grabMenus = menuRepository.findByWeekdayAndMenuType(weekday, "GRAB_AND_GO");
+                    List<Menu> grabMenus = menuRepository.findByWeekdayAndMenuDateAndMenuType(
+                            weekday, menuDate, "GRAB_AND_GO");
                     MenuDayResponse grabAndGo = grabMenus.isEmpty() ? null :
                             mapToMenuDayResponse(grabMenus.get(0));
 
+                    // 각 요일의 메뉴 정보를 반환
                     return MenuWeeklyResponse.builder()
                             .weekday(weekday)
-                            .breakfast(breakfast)
-                            .lunch(lunch)
-                            .dinner(dinner)
+                            .menus(menuLineResponses)
                             .grabAndGo(grabAndGo)
                             .build();
                 })
@@ -87,6 +85,7 @@ public class MenuServiceImpl implements MenuService {
                 .menuNutri(request.getMenuNutri())
                 .menuName(request.getMenuName())
                 .weekday(request.getWeekday())
+                .menuDate(request.getMenuDate()) // menuDate 필드 추가
                 .menuLiked(0)  // 새로운 메뉴는 선호도 0으로 초기화
                 .menuImgUrl(request.getMenuImgUrl())
                 .menuType(request.getMenuType())
@@ -109,6 +108,7 @@ public class MenuServiceImpl implements MenuService {
                 .menuNutri(request.getMenuNutri())
                 .menuName(request.getMenuName())
                 .weekday(request.getWeekday())
+                .menuDate(request.getMenuDate()) // menuDate 필드 추가
                 .menuLiked(existingMenu.getMenuLiked())  // 기존 선호도 유지
                 .menuImgUrl(request.getMenuImgUrl())
                 .menuType(request.getMenuType())
@@ -141,6 +141,7 @@ public class MenuServiceImpl implements MenuService {
                 .menuNutri(menu.getMenuNutri())
                 .menuName(menu.getMenuName())
                 .weekday(menu.getWeekday())
+                .menuDate(menu.getMenuDate()) // menuDate 필드 유지
                 .menuLiked(menu.getMenuLiked() + 1)  // 선호도 증가
                 .menuImgUrl(menu.getMenuImgUrl())
                 .menuType(menu.getMenuType())
@@ -152,30 +153,44 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    public List<MenuRankResponse> getMenuRanking() {
-        List<Menu> menus = menuRepository.findAllOrderByMenuLikedDesc();
-        return menus.stream()
-                .map(menu -> MenuRankResponse.builder()
-                        .idMenu(menu.getIdMenu())
-                        .menuName(menu.getMenuName())
-                        .menuLiked(menu.getMenuLiked())
-                        .menuType(menu.getMenuType())
-                        .build())
-                .collect(Collectors.toList());
+    @Transactional
+    public MenuResponse dislikeMenu(MenuLikeRequest request) {
+        Menu menu = menuRepository.findById(request.getMenuId())
+                .orElseThrow(() -> new RuntimeException("메뉴를 찾을 수 없습니다."));
+
+        Menu updatedMenu = Menu.builder()
+                .idMenu(menu.getIdMenu())
+                .menuLine(menu.getMenuLine())
+                .menuKcal(menu.getMenuKcal())
+                .menuNutri(menu.getMenuNutri())
+                .menuName(menu.getMenuName())
+                .weekday(menu.getWeekday())
+                .menuDate(menu.getMenuDate()) // menuDate 필드 유지
+                .menuLiked(menu.getMenuLiked() - 1)  // 선호도 증가
+                .menuImgUrl(menu.getMenuImgUrl())
+                .menuType(menu.getMenuType())
+                .feedback(menu.getFeedback())
+                .build();
+
+        Menu savedMenu = menuRepository.save(updatedMenu);
+        return mapToMenuResponse(savedMenu);
     }
 
     @Override
     public List<MenuResponse> getTodayMenus(String weekday) {
+        LocalDate today = LocalDate.now();
+
         if (weekday == null || weekday.isEmpty()) {
             // 요일 지정이 없으면 오늘 요일로 설정
-            LocalDate today = LocalDate.now();
             DayOfWeek dayOfWeek = today.getDayOfWeek();
             weekday = dayOfWeek.getDisplayName(TextStyle.FULL, Locale.KOREAN);
         }
 
-        List<Menu> menus = menuRepository.findByWeekday(weekday);
+        // 해당 요일과 오늘 날짜에 맞는 메뉴 조회
+        List<Menu> menus = menuRepository.findByWeekdayAndMenuDate(weekday, today);
         return menus.stream()
                 .map(this::mapToMenuResponse)
+                .sorted(Comparator.comparing(MenuResponse::getMenuLiked).reversed()) // 선호도 내림차순 정렬
                 .collect(Collectors.toList());
     }
 
@@ -187,6 +202,7 @@ public class MenuServiceImpl implements MenuService {
                 .menuNutri(menu.getMenuNutri())
                 .menuName(menu.getMenuName())
                 .weekday(menu.getWeekday())
+                .menuDate(menu.getMenuDate())
                 .menuLiked(menu.getMenuLiked())
                 .menuImgUrl(menu.getMenuImgUrl())
                 .menuType(menu.getMenuType())
@@ -201,6 +217,7 @@ public class MenuServiceImpl implements MenuService {
                 .menuNutri(menu.getMenuNutri())
                 .menuLiked(menu.getMenuLiked())
                 .menuImgUrl(menu.getMenuImgUrl())
+                .menuDate(menu.getMenuDate())
                 .build();
     }
 }

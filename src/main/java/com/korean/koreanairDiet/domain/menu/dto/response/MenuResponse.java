@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Getter
 @Builder
 @NoArgsConstructor
@@ -16,6 +18,7 @@ public class MenuResponse {
     private String menuNutri;
     private String menuName;
     private String weekday;
+    private LocalDate menuDate;
     private Integer menuLiked;
     private String menuImgUrl;
     private String menuType;
