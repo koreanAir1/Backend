@@ -33,6 +33,7 @@ public class FeedbackServiceImpl implements FeedbackService {
                 // 피드백이 null인 경우 새 피드백 생성
                 if (feedback == null) {
                         feedback = Feedback.builder()
+                        .menu(menu) 
                                         .feedbackSalty(0)
                                         .feedbackSpicy(0)
                                         .feedbackSweet(0)

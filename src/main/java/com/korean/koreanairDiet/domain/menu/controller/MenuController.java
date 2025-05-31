@@ -23,6 +23,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @Tag(name = "메뉴 API", description = "식단 메뉴 관련 API")
+@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/api/menu")
 public class MenuController {
     private final MenuService menuService;
