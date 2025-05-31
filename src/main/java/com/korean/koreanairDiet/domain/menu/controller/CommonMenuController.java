@@ -22,6 +22,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @Tag(name = "공통메뉴 API", description = "공통 제공 메뉴 관련 API")
+@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/api/common-menu")
 public class CommonMenuController {
     private final CommonMenuService commonMenuService;
