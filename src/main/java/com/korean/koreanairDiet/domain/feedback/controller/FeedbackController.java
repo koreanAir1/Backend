@@ -23,6 +23,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @Tag(name = "피드백 API", description = "메뉴별 피드백 관련 API")
+@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/api/feedback")
 public class FeedbackController {
     private final FeedbackService feedbackService;
