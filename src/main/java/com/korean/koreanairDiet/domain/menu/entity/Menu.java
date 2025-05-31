@@ -38,8 +38,8 @@ public class Menu {
     @Column(name = "menu_date")
     private LocalDate menuDate; // 실제 메뉴 제공 날짜
 
-    @Column(name = "menu_liked")
-    private Integer menuLiked; // 선호도 개수
+    @Column(name = "menu_liked", columnDefinition = "integer default 0")
+    private Integer menuLiked = 0; // 선호도 개수
 
     @Column(name = "menu_imgURL", length = 200)
     private String menuImgUrl; // 메뉴 이미지 URL
