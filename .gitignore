@@ -38,3 +38,4 @@ out/
 
 ### PROPERTIES ###
 *properties
+src/main/resources/application-local.properties
