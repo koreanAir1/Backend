@@ -45,7 +45,7 @@ public class Menu {
     private String menuImgUrl; // 메뉴 이미지 URL
 
     @Column(name = "menu_type", length = 10)
-    private String menuType; // 'REGULAR', 'GRAB_AND_GO' 등으로 구분
+    private String menuType; // 'REGULAR', 'GRSAB_AND_GO' 등으로 구분S
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_feedback")

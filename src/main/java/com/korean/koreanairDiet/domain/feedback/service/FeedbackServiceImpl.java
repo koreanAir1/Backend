@@ -79,6 +79,7 @@ public class FeedbackServiceImpl implements FeedbackService {
 
                 // 메뉴와 피드백 연결
                 menu.setFeedback(feedback);
+                feedback.setMenu(menu);
                 menuRepository.save(menu);
 
                 return mapToFeedbackResponse(feedback);

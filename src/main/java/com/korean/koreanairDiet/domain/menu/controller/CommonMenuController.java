@@ -2,6 +2,7 @@ package com.korean.koreanairDiet.domain.menu.controller;
 
 import com.korean.koreanairDiet.domain.menu.dto.request.CommonMenuRequest;
 import com.korean.koreanairDiet.domain.menu.dto.response.CommonMenuResponse;
+import com.korean.koreanairDiet.domain.menu.dto.response.CommonMenuWeeklyResponse;
 import com.korean.koreanairDiet.domain.menu.service.CommonMenuService;
 import com.korean.koreanairDiet.global.response.ResponseCode;
 import com.korean.koreanairDiet.global.response.ResponseForm;
@@ -25,20 +26,11 @@ import java.util.List;
 public class CommonMenuController {
     private final CommonMenuService commonMenuService;
 
-    @Operation(summary = "공통 메뉴 상세 조회", description = "특정 ID의 공통 메뉴 정보를 조회합니다")
-    @ApiResponse(responseCode = "200", description = "성공 - 공통 메뉴 조회 성공", content = @Content(schema = @Schema(implementation = CommonMenuResponse.class)))
-    @ApiResponse(responseCode = "404", description = "실패 - 공통 메뉴를 찾을 수 없음")
-    @GetMapping("/{commonMenuId}")
-    public ResponseEntity<ResponseForm> getCommonMenu(@PathVariable Long commonMenuId) {
-        CommonMenuResponse response = commonMenuService.getCommonMenuById(commonMenuId);
-        return ResponseEntity.ok(ResponseForm.of(ResponseCode.MENU_GET_SUCCESS, response));
-    }
-
-    @Operation(summary = "전체 공통 메뉴 조회", description = "모든 공통 메뉴 목록을 조회합니다")
-    @ApiResponse(responseCode = "200", description = "성공 - 공통 메뉴 목록 조회 성공", content = @Content(schema = @Schema(implementation = CommonMenuResponse.class)))
-    @GetMapping
-    public ResponseEntity<ResponseForm> getAllCommonMenus() {
-        List<CommonMenuResponse> responses = commonMenuService.getAllCommonMenus();
+    @Operation(summary = "일주일 공통 메뉴 조회", description = "월요일부터 금요일까지의 공통 메뉴를 조회합니다")
+    @ApiResponse(responseCode = "200", description = "성공 - 일주일 공통 메뉴 조회 성공")
+    @GetMapping("/weekly")
+    public ResponseEntity<ResponseForm> getWeeklyCommonMenus() {
+        List<CommonMenuWeeklyResponse> responses = commonMenuService.getWeeklyCommonMenus();
         return ResponseEntity.ok(ResponseForm.of(ResponseCode.MENU_LIST_SUCCESS, responses));
     }
 
@@ -48,6 +40,15 @@ public class CommonMenuController {
     public ResponseEntity<ResponseForm> getCommonMenusByWeekday(@RequestParam String weekday) {
         List<CommonMenuResponse> responses = commonMenuService.getCommonMenusByWeekday(weekday);
         return ResponseEntity.ok(ResponseForm.of(ResponseCode.MENU_LIST_SUCCESS, responses));
+    }
+
+    @Operation(summary = "공통 메뉴 상세 조회", description = "특정 ID의 공통 메뉴 정보를 조회합니다")
+    @ApiResponse(responseCode = "200", description = "성공 - 공통 메뉴 조회 성공", content = @Content(schema = @Schema(implementation = CommonMenuResponse.class)))
+    @ApiResponse(responseCode = "404", description = "실패 - 공통 메뉴를 찾을 수 없음")
+    @GetMapping("/{commonMenuId}")
+    public ResponseEntity<ResponseForm> getCommonMenu(@PathVariable Long commonMenuId) {
+        CommonMenuResponse response = commonMenuService.getCommonMenuById(commonMenuId);
+        return ResponseEntity.ok(ResponseForm.of(ResponseCode.MENU_GET_SUCCESS, response));
     }
 
     @Operation(summary = "공통 메뉴 추가", description = "새로운 공통 메뉴를 추가합니다")

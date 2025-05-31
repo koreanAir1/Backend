@@ -2,6 +2,7 @@ package com.korean.koreanairDiet.domain.menu.service;
 
 import com.korean.koreanairDiet.domain.menu.dto.request.CommonMenuRequest;
 import com.korean.koreanairDiet.domain.menu.dto.response.CommonMenuResponse;
+import com.korean.koreanairDiet.domain.menu.dto.response.CommonMenuWeeklyResponse;
 import com.korean.koreanairDiet.domain.menu.entity.CommonMenu;
 import com.korean.koreanairDiet.domain.menu.repository.CommonMenuRepository;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,14 +25,6 @@ public class CommonMenuServiceImpl implements CommonMenuService {
         CommonMenu commonMenu = commonMenuRepository.findById(commonMenuId)
                 .orElseThrow(() -> new RuntimeException("공통 메뉴를 찾을 수 없습니다."));
         return mapToCommonMenuResponse(commonMenu);
-    }
-
-    @Override
-    public List<CommonMenuResponse> getAllCommonMenus() {
-        List<CommonMenu> commonMenus = commonMenuRepository.findAll();
-        return commonMenus.stream()
-                .map(this::mapToCommonMenuResponse)
-                .collect(Collectors.toList());
     }
 
     @Override
@@ -76,6 +70,27 @@ public class CommonMenuServiceImpl implements CommonMenuService {
             throw new RuntimeException("공통 메뉴를 찾을 수 없습니다.");
         }
         commonMenuRepository.deleteById(commonMenuId);
+    }
+
+    @Override
+    public List<CommonMenuWeeklyResponse> getWeeklyCommonMenus() {
+        List<String> weekdays = Arrays.asList("월요일", "화요일", "수요일", "목요일", "금요일");
+
+        return weekdays.stream()
+                .map(weekday -> {
+                    // 해당 요일의 공통 메뉴 조회
+                    List<CommonMenu> commonMenus = commonMenuRepository.findByWeekday(weekday);
+                    List<CommonMenuResponse> commonMenuResponses = commonMenus.stream()
+                            .map(this::mapToCommonMenuResponse)
+                            .collect(Collectors.toList());
+
+                    // 응답 객체 생성
+                    return CommonMenuWeeklyResponse.builder()
+                            .weekday(weekday)
+                            .commonMenus(commonMenuResponses)
+                            .build();
+                })
+                .collect(Collectors.toList());
     }
 
     private CommonMenuResponse mapToCommonMenuResponse(CommonMenu commonMenu) {
