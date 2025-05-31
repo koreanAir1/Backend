@@ -8,6 +8,6 @@ import java.util.List;
 
 public interface FeedbackService {
     FeedbackResponse addFeedback(FeedbackRequest request);
-    FeedbackResponse getFeedbackById(Long feedbackId);
+    FeedbackResponse getFeedbackById(Long menuId);
     //List<FeedbackStatsResponse> getAllFeedbackStats();
 }

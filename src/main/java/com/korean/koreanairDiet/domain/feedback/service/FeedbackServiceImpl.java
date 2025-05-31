@@ -87,8 +87,10 @@ public class FeedbackServiceImpl implements FeedbackService {
         }
 
         @Override // 피드백 ID로 피드백 조회
-        public FeedbackResponse getFeedbackById(Long feedbackId) {
-                Feedback feedback = feedbackRepository.findById(feedbackId)
+        public FeedbackResponse getFeedbackById(Long menuId) {
+                Menu menu = menuRepository.findById(menuId)
+                                .orElseThrow(() -> new RuntimeException("메뉴 정보를 찾을 수 없습니다."));
+                Feedback feedback = feedbackRepository.findById(menu.getFeedback().getIdFeedback())
                                 .orElseThrow(() -> new RuntimeException("피드백 정보를 찾을 수 없습니다."));
                 return mapToFeedbackResponse(feedback);
         }

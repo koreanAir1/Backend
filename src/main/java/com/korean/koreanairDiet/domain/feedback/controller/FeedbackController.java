@@ -40,9 +40,9 @@ public class FeedbackController {
     @Operation(summary = "피드백 조회", description = "특정 ID의 피드백 정보를 조회합니다")
     @ApiResponse(responseCode = "200", description = "성공 - 피드백 정보 조회 성공", content = @Content(schema = @Schema(implementation = FeedbackResponse.class)))
     @ApiResponse(responseCode = "404", description = "실패 - 피드백 정보를 찾을 수 없음")
-    @GetMapping("/{feedbackId}")
-    public ResponseEntity<ResponseForm> getFeedback(@PathVariable Long feedbackId) {
-        FeedbackResponse response = feedbackService.getFeedbackById(feedbackId);
+    @GetMapping("/{menuId}")
+    public ResponseEntity<ResponseForm> getFeedback(@PathVariable Long menuId) {
+        FeedbackResponse response = feedbackService.getFeedbackById(menuId);
         return ResponseEntity.ok(ResponseForm.of(ResponseCode.FEEDBACK_GET_SUCCESS, response));
     }
 
