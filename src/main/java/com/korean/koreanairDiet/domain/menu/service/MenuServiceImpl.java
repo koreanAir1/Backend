@@ -36,7 +36,7 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     public List<MenuWeeklyResponse> getWeeklyMenus() {
-        List<String> weekdays = Arrays.asList("MON", "TUE", "WED", "THR", "FRI");
+        List<String> weekdays = Arrays.asList("MON", "TUE", "WED", "THU", "FRI");
 
         // 테스트를 위해 5월 26일을 시작일로 고정 (월요일)
         LocalDate startOfWeek = LocalDate.of(2025, 5, 26);
